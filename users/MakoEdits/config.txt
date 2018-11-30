@@ -1,0 +1,7 @@
+{
+	"username": "MakoEdits",
+	"password": "test",
+	"email": "test@test.co.nz",
+	"DOB": "(25/7/1969)",
+	"currency": "NZD"
+}

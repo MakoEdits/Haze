@@ -1,0 +1,17 @@
+{
+	"Australia": {
+		"currency": "AUD",
+		"language": "English"},
+	"Britain": {
+		"currency": "GBP",
+		"language": "English"},
+	"Canada": {
+		"currency": "CAD",
+		"language": "English"},
+	"New Zealand": {
+		"currency": "NZD",
+		"language": "English"},
+	"United States": {
+		"currency": "USD",
+		"language": "English"}
+}

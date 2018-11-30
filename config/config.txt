@@ -1,0 +1,5 @@
+{
+	"logged": "True",
+	"currentUser": "MakoEdits",
+	"currency": "NZD"
+}
