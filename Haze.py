@@ -1,4 +1,4 @@
-﻿import json, sys, os, time
+import json, sys, os, time
 import tkinter as tk
 from tkinter import font as tkfont
 
@@ -20,28 +20,28 @@ class CurrentUser:
         self.password = password
         self.email = email
         self.DOB = DOB
-        self.gamesLibrary = DictionaryReader(str(path)+"/users/"+str(username)+"/gamesLibrary")
+        self.gamesLibrary = dictionary_reader(str(path)+"/users/"+str(username)+"/gamesLibrary")
         self.gamesList = []
-        self.sortedPlayed = self.gamesInfo()
+        self.sortedPlayed = self.games_info()
         self.currentlyPlaying = False
-        self.currency = currency
+        self.currency = "NZD"
         self.shoppingCart = ["", ""]
         self.cartIndexes = ["",""]
 
     #Sorts the users game library by the time played descending to be used in quick access tab
-    def gamesInfo(self):
+    def games_info(self):
         gamesList = []
         for x in self.gamesLibrary.items():
             gamesList.append(list(x))
         self.gamesList = gamesList
-        sortedPlayed = self.sortPlayed(gamesList)
+        sortedPlayed = self.sort_played(gamesList)
         if len(sortedPlayed) < 3:
             return "Empty"
         else:
             return list(reversed(sortedPlayed))
 
     #Quicksort algorithm to sort by time played
-    def sortPlayed(self, List):
+    def sort_played(self, List):
         less = []
         equal = []
         greater = []
@@ -54,7 +54,7 @@ class CurrentUser:
                     equal.append(x)
                 if x[1]["timePlayed"] > pivot:
                     greater.append(x)
-            return self.sortPlayed(less)+equal+self.sortPlayed(greater)
+            return self.sort_played(less)+equal+self.sort_played(greater)
         else:
             return List
 
@@ -128,7 +128,7 @@ class Haze_Login(tk.Frame):
         self.entryTraceUsername = tk.StringVar()
         self.entryTraceUsername.set("")
         self.entryTraceUsername.trace("w", lambda name, index, mode, entryTraceUsername=self.entryTraceUsername: 
-            self.testEntry(self.entryTraceUsername, 0))
+            self.test_entry(self.entryTraceUsername, 0))
         entryUsername = tk.Entry(frameUsername, borderwidth=0, bg=DS.startupD, insertbackground=DS.startupFG, fg=DS.startupFG, textvariable=self.entryTraceUsername)
         entryUsername.pack(padx=(3,12), side="right")
         #Password login entry and label
@@ -138,7 +138,7 @@ class Haze_Login(tk.Frame):
         self.entryTracePassword = tk.StringVar()
         self.entryTracePassword.set("")
         self.entryTracePassword.trace("w", lambda name, index, mode, entryTracePassword=self.entryTracePassword: 
-            self.testEntry(self.entryTracePassword, 1))
+            self.test_entry(self.entryTracePassword, 1))
         entryPassword = tk.Entry(framePassword, borderwidth=0, show="*", insertbackground=DS.startupFG, fg=DS.startupFG, bg=DS.startupD, textvariable=self.entryTracePassword)
         entryPassword.pack(padx=(3,12), side="right")
         frameRemember = tk.Frame(frameEntries, bg=DS.startupBG)
@@ -153,9 +153,9 @@ class Haze_Login(tk.Frame):
             self.login(self.entryTraceUsername.get(), self.entryTracePassword.get(), checkTraceRemember.get(), controller))
         buttonLogin.bind('<Return>', lambda: self.login(lambda: self.entryTraceUsername.get(), lambda: self.entryTracePassword.get(), checkTraceRemember.get(), controller))
         buttonLogin.pack(padx=5, side="left")
-        buttonCreateAccount = tk.Button(frameButtons, borderwidth=0, bg=DS.startupD, fg=DS.startupFG, text="Create Account", width=12,
+        buttoncrate_account = tk.Button(frameButtons, borderwidth=0, bg=DS.startupD, fg=DS.startupFG, text="Create Account", width=12,
             command=lambda: controller.show_frame("Haze_Create"))
-        buttonCreateAccount.pack(padx=5, side="left")
+        buttoncrate_account.pack(padx=5, side="left")
         self.prevList = ["", ""]
         #Logo
         frameLogo = tk.Frame(frameLogin)
@@ -179,18 +179,14 @@ class Haze_Login(tk.Frame):
     def login(self, username, password, checkTraceRemember, controller):
         global path, app
         try:
-            user = DictionaryReader(str(path) + "/users/" + str(username) + "/config")
-        except Exception as e:
-            print(e)
-            raiseError("Username or Password is incorrect")
-            print("username")
+            user = dictionary_reader(str(path) + "/users/" + str(username) + "/config")
+        except:
+            Raise_Error("Username or Password is incorrect")
         else:
             if password != user["password"]:
-                print("Password")
-                raiseError("Username or Password is incorrect")
+                Raise_Error("Username or Password is incorrect")
             else:
                 with open(path+"/config/config.txt", "w") as config:
-                    print()
                     if checkTraceRemember:
                         config.write('{\n\t"logged": "True",\n\t"currentUser": "' + str(username) + '",\n\t"currency": "' + str(user["currency"]) + '"\n}')
                     else:
@@ -203,7 +199,7 @@ class Haze_Login(tk.Frame):
                 app.mainloop()
 
     #Disallows space character
-    def testEntry(self, entry, index):
+    def test_entry(self, entry, index):
         userInput = entry.get()
         if " " in userInput:
             entry.set(self.prevList[index])
@@ -231,7 +227,7 @@ class Haze_Create(tk.Frame):
         self.entryTraceUsername = tk.StringVar()
         self.entryTraceUsername.set("")
         self.entryTraceUsername.trace("w", lambda name, index, mode, entryTraceUsername=self.entryTraceUsername: 
-            self.testSpace(self.entryTraceUsername, 3))
+            self.test_space(self.entryTraceUsername, 3))
         entryUsername = tk.Entry(frameUsername, borderwidth=0, textvariable=self.entryTraceUsername, insertbackground=DS.startupFG, bg=DS.startupD, fg=DS.startupFG)
         entryUsername.pack(padx=3, side="right")
         #Email entry and label
@@ -241,7 +237,7 @@ class Haze_Create(tk.Frame):
         self.entryTraceEmail = tk.StringVar()
         self.entryTraceEmail.set("")
         self.entryTraceEmail.trace("w", lambda name, index, mode, entryTraceEmail=self.entryTraceEmail: 
-            self.testSpace(self.entryTraceEmail, 4))
+            self.test_space(self.entryTraceEmail, 4))
         entryEmail = tk.Entry(frameEmail, borderwidth=0, textvariable=self.entryTraceEmail, insertbackground=DS.startupFG, bg=DS.startupD, fg=DS.startupFG)
         entryEmail.pack(padx=3, side="right")
         #Password entry and label
@@ -251,7 +247,7 @@ class Haze_Create(tk.Frame):
         self.entryTracePassword = tk.StringVar()
         self.entryTracePassword.set("")
         self.entryTracePassword.trace("w", lambda name, index, mode, entryTracePassword=self.entryTracePassword: 
-            self.testSpace(self.entryTracePassword, 5))
+            self.test_space(self.entryTracePassword, 5))
         entryPassword = tk.Entry(framePassword, borderwidth=0, textvariable=self.entryTracePassword, insertbackground=DS.startupFG, bg=DS.startupD, fg=DS.startupFG)
         entryPassword.pack(padx=3, side="right")
         #DOB title
@@ -264,7 +260,7 @@ class Haze_Create(tk.Frame):
         self.entryTraceD = tk.StringVar()
         self.entryTraceD.set("")
         self.entryTraceD.trace("w", lambda name, index, mode, entryTracePassword=self.entryTraceD: 
-            self.testDate(self.entryTraceD.get(), self.entryTraceD, 2, 0))
+            self.test_date(self.entryTraceD.get(), self.entryTraceD, 2, 0))
         entryD = tk.Entry(frameDOB, borderwidth=0, textvariable=self.entryTraceD, width=3, insertbackground=DS.startupFG, bg=DS.startupD, fg=DS.startupFG)
         entryD.pack(padx=1, side="left",)
         #Month entry and label
@@ -273,7 +269,7 @@ class Haze_Create(tk.Frame):
         self.entryTraceM = tk.StringVar()
         self.entryTraceM.set("")
         self.entryTraceM.trace("w", lambda name, index, mode, entryTraceM=self.entryTraceM: 
-            self.testDate(self.entryTraceM.get(), self.entryTraceM, 2, 1))
+            self.test_date(self.entryTraceM.get(), self.entryTraceM, 2, 1))
         entryM = tk.Entry(frameDOB, borderwidth=0, textvariable=self.entryTraceM, width=3, insertbackground=DS.startupFG, bg=DS.startupD, fg=DS.startupFG)
         entryM.pack(padx=1, side="left")
         #Year entry and lbel
@@ -282,17 +278,17 @@ class Haze_Create(tk.Frame):
         self.entryTraceY = tk.StringVar()
         self.entryTraceY.set("")
         self.entryTraceY.trace("w", lambda name, index, mode, entryTraceY=self.entryTraceY: 
-            self.testDate(self.entryTraceY.get(), self.entryTraceY, 4, 2))
+            self.test_date(self.entryTraceY.get(), self.entryTraceY, 4, 2))
         entryY = tk.Entry(frameDOB, borderwidth=0, textvariable=self.entryTraceY, width=6, insertbackground=DS.startupFG, bg=DS.startupD, fg=DS.startupFG)
         entryY.pack(padx=(1, 11), side="left")
         self.prevList = ["", "", "", "", "", ""]
         #Submit buttons
         frameButtons = tk.Frame(frameCreate, bg=DS.startupBG)
-        buttonCreateAccount = tk.Button(frameButtons, borderwidth=0, text="Create Account", bg=DS.startupD, fg=DS.startupFG, command=lambda: 
-            self.createAccount(self.entryTraceUsername.get(), self.entryTraceEmail.get(), self.entryTracePassword.get(),
-                self.formatDOB(entryD.get(), entryM.get(), entryY.get())))
-        buttonCreateAccount.pack(side="left", padx=10)
-        buttonLogin = tk.Button(frameButtons, borderwidth=0, text="Back to login", bg=DS.startupD, fg=DS.startupFG, command=lambda: self.resetCreate(controller))
+        buttoncrate_account = tk.Button(frameButtons, borderwidth=0, text="Create Account", bg=DS.startupD, fg=DS.startupFG, command=lambda: 
+            self.crate_account(self.entryTraceUsername.get(), self.entryTraceEmail.get(), self.entryTracePassword.get(),
+                self.format_DOB(entryD.get(), entryM.get(), entryY.get())))
+        buttoncrate_account.pack(side="left", padx=10)
+        buttonLogin = tk.Button(frameButtons, borderwidth=0, text="Back to login", bg=DS.startupD, fg=DS.startupFG, command=lambda: self.reset_create(controller))
         buttonLogin.pack(side="left", padx=(10,4))
         #Error Message
         frameError = tk.Frame(frameCreate, bg=DS.startupBG)
@@ -311,7 +307,7 @@ class Haze_Create(tk.Frame):
         frameCreate.pack(fill="x")
 
     #Tests for space character in entry
-    def testSpace(self, entry, index):
+    def test_space(self, entry, index):
         userInput = entry.get()
         if " " in userInput:
             entry.set(self.prevList[index])
@@ -319,14 +315,14 @@ class Haze_Create(tk.Frame):
             self.prevList[index] = entry
 
     #Resets user inputs 
-    def resetCreate(self, controller):
+    def reset_create(self, controller):
         for entry in [self.entryTraceUsername, self.entryTracePassword, self.entryTraceEmail,
         self.entryTraceD, self.entryTraceM, self.entryTraceY, self.labelErrorVar]:
             entry.set("")
         controller.show_frame("Haze_Login")
 
     #Validates users input
-    def testDate(self, userInput, label, labelMax, index):
+    def test_date(self, userInput, label, labelMax, index):
         if len(userInput) <= labelMax and userInput.isnumeric() or userInput == "":
             label.set(userInput)
             self.prevList[index] = userInput
@@ -334,7 +330,7 @@ class Haze_Create(tk.Frame):
             label.set(self.prevList[index])
 
     #Validates entered info
-    def formatDate(self, date):  
+    def format_date(self, date):  
         if date == "":
             return int(99999)
         if date[0] == "0":
@@ -343,10 +339,10 @@ class Haze_Create(tk.Frame):
             return int(date)
 
     #Tests for Errors in DOB
-    def formatDOB(self, day, month, year):
+    def format_DOB(self, day, month, year):
         Return = []
-        day = self.formatDate(day)
-        month = self.formatDate(month)
+        day = self.format_date(day)
+        month = self.format_date(month)
         if month > 12:
             Return += ["Day and Month"]
         elif not (day<=29 and month==2) and not (day<=30 and month in [4,7,9,11]) and not (day<=31 and month in [1,3,5,6,8,10,12]):
@@ -361,7 +357,7 @@ class Haze_Create(tk.Frame):
         return Return
     
     #Validates entered info based on determined rules
-    def createAccount(self, username, email, password, dob, controller):
+    def crate_account(self, username, email, password, dob, controller):
         global app, path
         errorList = ""
         if username in userList:
@@ -425,11 +421,11 @@ class Haze_Main(tk.Frame):
         self.labelSettings.bind("<Enter>", lambda event: self.on_enter(self.labelSettings))
         self.labelSettings.bind("<Leave>", lambda event: self.on_leave(self.labelSettings))
         self.labelSettings.grid(column=2, row=0, padx=26, pady=8)
-        self.labelLogout = tk.Label(frameHeaderBar, text="Logout", font=headerFont, fg=DS.mainFG, bg=DS.mainBG)
-        self.labelLogout.bind("<Button-1>", lambda event: self.Logout())
-        self.labelLogout.bind("<Enter>", lambda event: self.on_enter(self.labelLogout))
-        self.labelLogout.bind("<Leave>", lambda event: self.on_leave(self.labelLogout))
-        self.labelLogout.grid(column=3, row=0, padx=(95,26), pady=8)
+        self.labellogout = tk.Label(frameHeaderBar, text="logout", font=headerFont, fg=DS.mainFG, bg=DS.mainBG)
+        self.labellogout.bind("<Button-1>", lambda event: self.logout())
+        self.labellogout.bind("<Enter>", lambda event: self.on_enter(self.labellogout))
+        self.labellogout.bind("<Leave>", lambda event: self.on_leave(self.labellogout))
+        self.labellogout.grid(column=3, row=0, padx=(95,26), pady=8)
         headerLine = tk.Canvas(frameHeaderBar, height=2, width=570, bd=0, highlightthickness=0, bg=lineStyle)
         headerLine.grid(row=1, padx=10, column=0, columnspan=4)
         frameHeaderBar.grid(row=0)
@@ -448,8 +444,8 @@ class Haze_Main(tk.Frame):
         midLine = tk.Canvas(frameMainFrame, height=300, bd=0, highlightthickness=0, width=2, bg=lineStyle)
         midLine.grid(row=0, column=1, padx=(16,0), rowspan=3, pady=0)
         #Promos
-        self.gamesLibrary = list(DictionaryReader("config/gamesLibrary").items())
-        self.saleInfo = list(DictionaryReader("config/saleInfo").items())
+        self.gamesLibrary = list(dictionary_reader("config/gamesLibrary").items())
+        self.saleInfo = list(dictionary_reader("config/saleInfo").items())
         saleFont = tkfont.Font(family='Arial', size=20, weight="bold")
         fontS = tkfont.Font(family="Arial", overstrike=1, size=10)
         framePromos = tk.Frame(frameMainFrame, bg=DS.mainBG)
@@ -467,11 +463,11 @@ class Haze_Main(tk.Frame):
             labelPromo1Title.grid(row=0, column=0, pady=10, columnspan=2)
             framePromo1Frame = tk.Frame(framePromo1, bg=DS.startupD)
             labelPromo1RedSVar = tk.StringVar()
-            labelPromo1RedSVar.set(self.DisplaySale(0, False))
+            labelPromo1RedSVar.set(self.display_sale(0, False))
             labelPromo1RedS = tk.Label(framePromo1Frame, textvariable=labelPromo1RedSVar, bg=DS.startupD, fg=DS.mainFG, font=fontS)
             labelPromo1RedS.grid(row=0, column=0)
             labelPromo1RedVar = tk.StringVar()
-            labelPromo1RedVar.set(self.DisplaySale(0, True))
+            labelPromo1RedVar.set(self.display_sale(0, True))
             labelPromo1Red = tk.Label(framePromo1Frame, textvariable=labelPromo1RedVar, bg=DS.startupD, fg=DS.mainFG)
             labelPromo1Red.grid(row=1, column=0)
             framePromo1Frame.grid(row=1, column=0, padx=25, pady=10)
@@ -488,11 +484,11 @@ class Haze_Main(tk.Frame):
             labelPromo2Title.grid(row=0, column=0, pady=10, columnspan=2)
             framePromo2Frame = tk.Frame(framePromo2, bg=DS.startupD)
             labelPromo2RedSVar = tk.StringVar()
-            labelPromo2RedSVar.set(self.DisplaySale(1, False))
+            labelPromo2RedSVar.set(self.display_sale(1, False))
             labelPromo2RedS = tk.Label(framePromo2Frame, textvariable=labelPromo2RedSVar, bg=DS.startupD, fg=DS.mainFG, font=fontS)
             labelPromo2RedS.grid(row=0, column=0)
             labelPromo2RedVar = tk.StringVar()
-            labelPromo2RedVar.set(self.DisplaySale(1, True))
+            labelPromo2RedVar.set(self.display_sale(1, True))
             labelPromo2Red = tk.Label(framePromo2Frame, textvariable=labelPromo2RedVar, bg=DS.startupD, fg=DS.mainFG)
             labelPromo2Red.grid(row=1, column=0)
             framePromo2Frame.grid(row=1, column=0, padx=25, pady=10)
@@ -530,7 +526,7 @@ class Haze_Main(tk.Frame):
             lableQuick1Time.grid(row=1, column=0, padx=10)
             buttonVar1 = tk.StringVar()
             buttonVar1.set("Play")
-            buttonPlay1 = tk.Button(frameQuickLinks, state="normal", bg=DS.mainHover, fg=DS.mainFG, command=lambda: LaunchGame(quick1Game), text="Play", font=tkfont.Font(family="Arial", size=10))
+            buttonPlay1 = tk.Button(frameQuickLinks, state="normal", bg=DS.mainHover, fg=DS.mainFG, command=lambda: Launch_Game(quick1Game), text="Play", font=tkfont.Font(family="Arial", size=10))
             buttonPlay1.grid(sticky="w", row=0, column=1, rowspan=1, padx=10, ipadx=2, pady=3)
             buttonList += [buttonPlay1]
             frameQuick1.grid(row=0, column=0, pady=(10,6), ipadx=10)
@@ -547,7 +543,7 @@ class Haze_Main(tk.Frame):
             lableQuick2Time.grid(row=1, column=0, padx=10)
             buttonVar2 = tk.StringVar()
             buttonVar2.set("Play")
-            buttonPlay2 = tk.Button(frameQuickLinks, state="normal", bg=DS.mainHover, fg=DS.mainFG, command=lambda: LaunchGame(quick2Game), text="Play", font=tkfont.Font(family="Arial", size=10))
+            buttonPlay2 = tk.Button(frameQuickLinks, state="normal", bg=DS.mainHover, fg=DS.mainFG, command=lambda: Launch_Game(quick2Game), text="Play", font=tkfont.Font(family="Arial", size=10))
             buttonPlay2.grid(sticky="w", row=1, column=1, rowspan=1, padx=10, ipadx=2, pady=3)
             buttonList += [buttonPlay2]
             frameQuick2.grid(row=1, column=0, pady=(10,6), ipadx=10)
@@ -564,7 +560,7 @@ class Haze_Main(tk.Frame):
             lableQuick3Time.grid(row=1, column=0)
             buttonVar3 = tk.StringVar()
             buttonVar3.set("Play")
-            buttonPlay3 = tk.Button(frameQuickLinks, state="normal", bg=DS.mainHover, fg=DS.mainFG, command=lambda: LaunchGame(quick3Game), text="Play", font=tkfont.Font(family="Arial", size=10))
+            buttonPlay3 = tk.Button(frameQuickLinks, state="normal", bg=DS.mainHover, fg=DS.mainFG, command=lambda: Launch_Game(quick3Game), text="Play", font=tkfont.Font(family="Arial", size=10))
             buttonPlay3.grid(sticky="w", row=2, column=1, rowspan=1, padx=10, ipadx=2, pady=3)
             buttonList += [buttonPlay3]
             frameQuick3.grid(row=2, column=0, pady=(10,6), ipadx=10)
@@ -575,32 +571,32 @@ class Haze_Main(tk.Frame):
         frameMain.grid()        
 
     #Formats the price before and after selected discount
-    def DisplaySale(self, index, divide):
+    def display_sale(self, index, divide):
         display = str(currentUser.currency) + " $"
         if divide:
-            display += str('%.3g'%(Converter((self.saleInfo[index][1] * self.gamesLibrary[int(self.saleInfo[index][0])][1]["price"]), currentUser.currency)-0.01))
+            display += str('%.3g'%(converter((self.saleInfo[index][1] * self.gamesLibrary[int(self.saleInfo[index][0])][1]["price"]), currentUser.currency)-0.01))
         else:
-            display += str('%.3g'%(Converter((self.gamesLibrary[int(self.saleInfo[index][0])][1]["price"]), currentUser.currency)-0.01))
+            display += str('%.3g'%(converter((self.gamesLibrary[int(self.saleInfo[index][0])][1]["price"]), currentUser.currency)-0.01))
         return display
 
     #Ask user if they want to logout
-    def Logout(self):
-        self.windowLogout = tk.Toplevel(bg=DS.mainBG)
-        self.windowLogout.resizable(False, False)
-        self.windowLogout.wm_title("Logout")
-        frameButtons = tk.Frame(self.windowLogout, bg=DS.mainBG)
-        labelLogoutMessage = tk.Label(self.windowLogout, fg=DS.mainFG, bg=DS.mainBG, text="Are you sure you want to log out?",
+    def logout(self):
+        self.windowlogout = tk.Toplevel(bg=DS.mainBG)
+        self.windowlogout.resizable(False, False)
+        self.windowlogout.wm_title("logout")
+        frameButtons = tk.Frame(self.windowlogout, bg=DS.mainBG)
+        labellogoutMessage = tk.Label(self.windowlogout, fg=DS.mainFG, bg=DS.mainBG, text="Are you sure you want to log out?",
             font=tkfont.Font(family='Arial', size=10, weight="bold", slant="roman")).pack(pady=(18,8), padx=15)
-        buttonYes = tk.Button(frameButtons, text="Yes", fg=DS.mainFG, bg=DS.mainBG, command=lambda: self.LogoutYes()).pack(padx=12, ipadx=8, pady=20, side="left")
-        buttonNo = tk.Button(frameButtons, text="No", fg=DS.mainFG, bg=DS.mainBG, command=self.windowLogout.destroy).pack(padx=12, ipadx=8, pady=20, side="left")
+        buttonYes = tk.Button(frameButtons, text="Yes", fg=DS.mainFG, bg=DS.mainBG, command=lambda: self.logout_yes()).pack(padx=12, ipadx=8, pady=20, side="left")
+        buttonNo = tk.Button(frameButtons, text="No", fg=DS.mainFG, bg=DS.mainBG, command=self.windowlogout.destroy).pack(padx=12, ipadx=8, pady=20, side="left")
         frameButtons.pack()
 
-    #Logout user
-    def LogoutYes(self):
+    #logout user
+    def logout_yes(self):
         global app, path
-        self.windowLogout.destroy()
+        self.windowlogout.destroy()
         config = open(str(path)+"/config/config.txt", "w")
-        config.write('{\n\t"logged": "False",\n\t"currentUser": ""\n\t"currency": "NZD"\n}')
+        config.write('{\n\t"logged": "False",\n\t"currentUser": "",\n\t"currency": "NZD"\n}')
         config.close()
         app.destroy()
         app = HazeStartup()
@@ -640,11 +636,11 @@ class Haze_Library(tk.Frame):
         self.labelSettings.bind("<Enter>", lambda event: self.on_enter(self.labelSettings))
         self.labelSettings.bind("<Leave>", lambda event: self.on_leave(self.labelSettings))
         self.labelSettings.grid(column=2, row=0, padx=26, pady=8)
-        self.labelLogout = tk.Label(frameHeaderBar, text="Logout", font=headerFont, fg=DS.mainFG, bg=DS.mainBG)
-        self.labelLogout.bind("<Button-1>", lambda event: self.Logout())
-        self.labelLogout.bind("<Enter>", lambda event: self.on_enter(self.labelLogout))
-        self.labelLogout.bind("<Leave>", lambda event: self.on_leave(self.labelLogout))
-        self.labelLogout.grid(column=3, row=0, padx=(95,26), pady=8)
+        self.labellogout = tk.Label(frameHeaderBar, text="logout", font=headerFont, fg=DS.mainFG, bg=DS.mainBG)
+        self.labellogout.bind("<Button-1>", lambda event: self.logout())
+        self.labellogout.bind("<Enter>", lambda event: self.on_enter(self.labellogout))
+        self.labellogout.bind("<Leave>", lambda event: self.on_leave(self.labellogout))
+        self.labellogout.grid(column=3, row=0, padx=(95,26), pady=8)
         headerLine = tk.Canvas(frameHeaderBar, height=2, width=570, bd=0, highlightthickness=0, bg=lineStyle)
         headerLine.grid(row=1, padx=10, column=0, columnspan=4)
         frameHeaderBar.grid(row=0)
@@ -659,82 +655,82 @@ class Haze_Library(tk.Frame):
         #Game 1
         frameGame1 = tk.Frame(frameGamesLibrary, bg=DS.startupD)
         labelGame1Var = tk.StringVar()
-        self.TryDisplay(0, labelGame1Var)
+        self.try_display(0, labelGame1Var)
         labelGame1Title = tk.Label(frameGame1, bg=DS.mainHover, fg=DS.mainFG, textvariable=labelGame1Var, font=titleFont)
         labelGame1Title.grid(row=0, column=0, ipadx=15)
-        labelGame1Title.bind("<Button-1>", lambda event: self.DisplayGame(0, labelGame1Title))
+        labelGame1Title.bind("<Button-1>", lambda event: self.display_game(0, labelGame1Title))
         frameGame1.grid(sticky="w", row=0, column=0, pady=(10,1), ipadx=20)
         #Game 2
         frameGame2 = tk.Frame(frameGamesLibrary, bg=DS.startupD)
         labelGame2Var = tk.StringVar()
-        self.TryDisplay(1, labelGame2Var)
+        self.try_display(1, labelGame2Var)
         labelGame2Title = tk.Label(frameGame2, bg=DS.startupD, fg=DS.mainFG, textvariable=labelGame2Var, font=titleFont)
         labelGame2Title.grid(row=0, column=0, ipadx=15)
-        labelGame2Title.bind("<Button-1>", lambda event: self.DisplayGame(1, labelGame2Title))
+        labelGame2Title.bind("<Button-1>", lambda event: self.display_game(1, labelGame2Title))
         frameGame2.grid(sticky="w", row=1, column=0, pady=1, ipadx=20)
         #Game 3
         frameGame3 = tk.Frame(frameGamesLibrary, bg=DS.startupD)
         labelGame3Var = tk.StringVar()
-        self.TryDisplay(2, labelGame3Var)
+        self.try_display(2, labelGame3Var)
         labelGame3Title = tk.Label(frameGame3, bg=DS.startupD, fg=DS.mainFG, textvariable=labelGame3Var, font=titleFont)
         labelGame3Title.grid(row=0, column=0, ipadx=15)
-        labelGame3Title.bind("<Button-1>", lambda event: self.DisplayGame(2, labelGame3Title))
+        labelGame3Title.bind("<Button-1>", lambda event: self.display_game(2, labelGame3Title))
         frameGame3.grid(sticky="w", row=2, column=0, pady=1, ipadx=20)
         #Game 4
         frameGame4 = tk.Frame(frameGamesLibrary, bg=DS.startupD)
         labelGame4Var = tk.StringVar()
-        self.TryDisplay(3, labelGame4Var)
+        self.try_display(3, labelGame4Var)
         labelGame4Title = tk.Label(frameGame4, bg=DS.startupD, fg=DS.mainFG, textvariable=labelGame4Var, font=titleFont)
         labelGame4Title.grid(row=0, column=0, ipadx=15)
-        labelGame4Title.bind("<Button-1>", lambda event: self.DisplayGame(3, labelGame4Title))
+        labelGame4Title.bind("<Button-1>", lambda event: self.display_game(3, labelGame4Title))
         frameGame4.grid(sticky="w", row=3, column=0, pady=1, ipadx=20)
         #Game 5
         frameGame5 = tk.Frame(frameGamesLibrary, bg=DS.startupD)
         labelGame5Var = tk.StringVar()
-        self.TryDisplay(4, labelGame5Var)
+        self.try_display(4, labelGame5Var)
         labelGame5Title = tk.Label(frameGame5, bg=DS.startupD, fg=DS.mainFG, textvariable=labelGame5Var, font=titleFont)
         labelGame5Title.grid(row=0, column=0, ipadx=15)
-        labelGame5Title.bind("<Button-1>", lambda event: self.DisplayGame(4, labelGame5Title))
+        labelGame5Title.bind("<Button-1>", lambda event: self.display_game(4, labelGame5Title))
         frameGame5.grid(sticky="w", row=4, column=0, pady=1, ipadx=20)
         #Game 6
         frameGame6 = tk.Frame(frameGamesLibrary, bg=DS.startupD)
         labelGame6Var = tk.StringVar()
-        self.TryDisplay(5, labelGame6Var)
+        self.try_display(5, labelGame6Var)
         labelGame6Title = tk.Label(frameGame6, bg=DS.startupD, fg=DS.mainFG, textvariable=labelGame6Var, font=titleFont)
         labelGame6Title.grid(row=0, column=0, ipadx=15)
-        labelGame6Title.bind("<Button-1>", lambda event: self.DisplayGame(5, labelGame6Title))
+        labelGame6Title.bind("<Button-1>", lambda event: self.display_game(5, labelGame6Title))
         frameGame6.grid(sticky="w", row=5, column=0, pady=1, ipadx=20)
         #Game 7
         frameGame7 = tk.Frame(frameGamesLibrary, bg=DS.startupD)
         labelGame7Var = tk.StringVar()
-        self.TryDisplay(6, labelGame7Var)
+        self.try_display(6, labelGame7Var)
         labelGame7Title = tk.Label(frameGame7, bg=DS.startupD, fg=DS.mainFG, textvariable=labelGame7Var, font=titleFont)
         labelGame7Title.grid(row=0, column=0, ipadx=15)
-        labelGame7Title.bind("<Button-1>", lambda event: self.DisplayGame(6, labelGame7Title))
+        labelGame7Title.bind("<Button-1>", lambda event: self.display_game(6, labelGame7Title))
         frameGame7.grid(sticky="w", row=6, column=0, pady=1, ipadx=20)
         #Game 8
         frameGame8 = tk.Frame(frameGamesLibrary, bg=DS.startupD)
         labelGame8Var = tk.StringVar()
-        self.TryDisplay(7, labelGame8Var)
+        self.try_display(7, labelGame8Var)
         labelGame8Title = tk.Label(frameGame8, bg=DS.startupD, fg=DS.mainFG, textvariable=labelGame8Var, font=titleFont)
         labelGame8Title.grid(row=0, column=0, ipadx=15)
-        labelGame8Title.bind("<Button-1>", lambda event: self.DisplayGame(7, labelGame8Title))
+        labelGame8Title.bind("<Button-1>", lambda event: self.display_game(7, labelGame8Title))
         frameGame8.grid(sticky="w", row=7, column=0, pady=1, ipadx=20)
         #Game 9
         frameGame9 = tk.Frame(frameGamesLibrary, bg=DS.startupD)
         labelGame9Var = tk.StringVar()
-        self.TryDisplay(8, labelGame9Var)
+        self.try_display(8, labelGame9Var)
         labelGame9Title = tk.Label(frameGame9, bg=DS.startupD, fg=DS.mainFG, textvariable=labelGame9Var, font=titleFont)
         labelGame9Title.grid(row=0, column=0, ipadx=15)
-        labelGame9Title.bind("<Button-1>", lambda event: self.DisplayGame(8, labelGame9Title))
+        labelGame9Title.bind("<Button-1>", lambda event: self.display_game(8, labelGame9Title))
         frameGame9.grid(sticky="w", row=8, column=0, pady=1, ipadx=20)
         #Game 10
         frameGame10 = tk.Frame(frameGamesLibrary, bg=DS.startupD)
         labelGame10Var = tk.StringVar()
-        self.TryDisplay(9, labelGame10Var)
+        self.try_display(9, labelGame10Var)
         labelGame10Title = tk.Label(frameGame10, bg=DS.startupD, fg=DS.mainFG, textvariable=labelGame10Var, font=titleFont)
         labelGame10Title.grid(row=0, column=0, ipadx=15)
-        labelGame10Title.bind("<Button-1>", lambda event: self.DisplayGame(9, labelGame10Title))
+        labelGame10Title.bind("<Button-1>", lambda event: self.display_game(9, labelGame10Title))
         frameGame10.grid(sticky="w", row=9, column=0, pady=1, ipadx=20)
         frameGamesLibrary.grid(sticky="w", row=1, column=0, padx=(28,20), ipadx=12, ipady=4)
 
@@ -773,13 +769,13 @@ class Haze_Library(tk.Frame):
         self.buttonGameVar = tk.StringVar()
         self.buttonGameVar.set("Play")
         self.buttonGame = tk.Button(frameGamesDisplay, textvariable=self.buttonGameVar, font=tkfont.Font(family="Arial", size=12), bg=DS.mainHover, fg=DS.mainFG, command=lambda:
-            self.InstallGame(self.currentIndex, self.InstallStatus(self.currentIndex)))
+            self.install_game(self.currentIndex, self.install_status(self.currentIndex)))
         self.buttonGame.grid(sticky="w", padx=32, pady=18, ipadx=10, ipady=3, row=4, column=0)
         self.buttonUninstall = tk.Button(frameGamesDisplay, text="Uninstall", font=tkfont.Font(family="Arial", size=10),
-            bg=DS.mainHover, fg=DS.mainFG, command=lambda: self.UninstallGame(self.currentIndex))
+            bg=DS.mainHover, fg=DS.mainFG, command=lambda: self.uninstall_game(self.currentIndex))
         self.buttonUninstall.grid(sticky="w", padx=32, pady=16, ipady=2, row=5, column=0)
         frameGamesDisplay.grid(row=0, column=2, rowspan=4, columnspan=2, sticky="e")
-        self.InstallStatus(self.currentIndex)
+        self.install_status(self.currentIndex)
         frameMainFrame.grid(sticky="w")
         frameMain.grid()  
         self.prevLabel = labelGame1Title
@@ -787,20 +783,19 @@ class Haze_Library(tk.Frame):
         buttonList += [self.buttonGame]
         buttonList += [self.buttonUninstall]
 
-    def TryDisplay(self, index, who):
+    def try_display(self, index, who):
         try:
             who.set(self.gamesLibrary[index][1]["title"])
         except:
             who.set(" ")
 
     #Updates the games library when the user installs/uninstalls a game
-    def UpdateLibrary(self):
-        currentUser.gamesLibrary = DictionaryReader(str(path)+"/users/"+str(currentUser.username)+"/gamesLibrary")
+    def update_library(self):
+        currentUser.gamesLibrary = dictionary_reader(str(path)+"/users/"+str(currentUser.username)+"/gamesLibrary")
         self.gamesLibrary = list(currentUser.gamesLibrary.items())
-        print(self.gamesLibrary)
 
     #Uninstalls the game the user has selected
-    def UninstallGame(self, index):
+    def uninstall_game(self, index):
         self.buttonUninstall["state"] = "disabled"
         self.buttonGameVar.set("Install")
         with open("users/" + str(currentUser.username) + "/gamesLibrary.txt", "r") as data:
@@ -811,11 +806,11 @@ class Haze_Library(tk.Frame):
                 data.writelines(gamesLibrary)
                 data.close()
             data.close()
-        self.UpdateLibrary()
+        self.update_library()
 
     #Installs the game the user has selected
-    def InstallGame(self, index, install):
-        if self.InstallStatus(self.currentIndex):
+    def install_game(self, index, install):
+        if not self.install_status(self.currentIndex):
             self.buttonGameVar.set("Play")
             self.buttonUninstall["state"] = "normal"
             with open("users/" + str(currentUser.username) + "/gamesLibrary.txt", "r") as data:
@@ -826,12 +821,12 @@ class Haze_Library(tk.Frame):
                     data.writelines(gamesLibrary)
                     data.close()
                 data.close()
-            self.UpdateLibrary()
+            self.update_library()
         else:
-            LaunchGame(self.gamesLibrary[index][1]["title"])
+            Launch_Game(self.gamesLibrary[index][1]["title"])
 
     #Updates the states of relevant buttons
-    def InstallStatus(self, index):
+    def install_status(self, index):
         if self.gamesLibrary[index][1]["installed"] == "False":
             self.buttonUninstall["state"] = "disabled"
             self.buttonGameVar.set("Install")
@@ -842,7 +837,7 @@ class Haze_Library(tk.Frame):
             return True
 
     #Updates the display area with selected game info
-    def DisplayGame(self, index, who):
+    def display_game(self, index, who):
         try:
             self.currentIndex = index
             self.prevLabel.config(bg=DS.startupD)
@@ -856,7 +851,7 @@ class Haze_Library(tk.Frame):
                 self.labelVRVar.set("")
             who.config(bg=DS.mainHover)
             self.prevLabel = who
-            self.InstallStatus(index)
+            self.install_status(index)
         except:
             pass
 
@@ -866,20 +861,20 @@ class Haze_Library(tk.Frame):
     def on_leave(self, who):
         who.config(fg=DS.mainFG)
 
-    def Logout(self):
-        self.windowLogout = tk.Toplevel(bg=DS.mainBG)
-        self.windowLogout.resizable(False, False)
-        self.windowLogout.wm_title("Logout")
-        frameButtons = tk.Frame(self.windowLogout, bg=DS.mainBG)
-        labelLogoutMessage = tk.Label(self.windowLogout, fg=DS.mainFG, bg=DS.mainBG, text="Are you sure you want to log out?",
+    def logout(self):
+        self.windowlogout = tk.Toplevel(bg=DS.mainBG)
+        self.windowlogout.resizable(False, False)
+        self.windowlogout.wm_title("logout")
+        frameButtons = tk.Frame(self.windowlogout, bg=DS.mainBG)
+        labellogoutMessage = tk.Label(self.windowlogout, fg=DS.mainFG, bg=DS.mainBG, text="Are you sure you want to log out?",
             font=tkfont.Font(family='Arial', size=10, weight="bold", slant="roman")).pack(pady=(18,8), padx=15)
-        buttonYes = tk.Button(frameButtons, text="Yes", fg=DS.mainFG, bg=DS.mainBG, command=lambda: self.LogoutYes()).pack(padx=12, ipadx=8, pady=20, side="left")
-        buttonNo = tk.Button(frameButtons, text="No", fg=DS.mainFG, bg=DS.mainBG, command=self.windowLogout.destroy).pack(padx=12, ipadx=8, pady=20, side="left")
+        buttonYes = tk.Button(frameButtons, text="Yes", fg=DS.mainFG, bg=DS.mainBG, command=lambda: self.logout_yes()).pack(padx=12, ipadx=8, pady=20, side="left")
+        buttonNo = tk.Button(frameButtons, text="No", fg=DS.mainFG, bg=DS.mainBG, command=self.windowlogout.destroy).pack(padx=12, ipadx=8, pady=20, side="left")
         frameButtons.pack()
 
-    def LogoutYes(self):
+    def logout_yes(self):
         global app, path
-        self.windowLogout.destroy()
+        self.windowlogout.destroy()
         config = open(str(path)+"/config/config.txt", "w")
         config.write('{\n\t"logged": "False",\n\t"currentUser": ""\n\t"currency": "NZD"\n}')
         config.close()
@@ -916,17 +911,17 @@ class Haze_Store(tk.Frame):
         self.labelSettings.bind("<Enter>", lambda event: self.on_enter(self.labelSettings))
         self.labelSettings.bind("<Leave>", lambda event: self.on_leave(self.labelSettings))
         self.labelSettings.grid(column=2, row=0, padx=26, pady=8)
-        self.labelLogout = tk.Label(frameHeaderBar, text="Logout", font=headerFont, fg=DS.mainFG, bg=DS.mainBG)
-        self.labelLogout.bind("<Button-1>", lambda event: self.Logout())
-        self.labelLogout.bind("<Enter>", lambda event: self.on_enter(self.labelLogout))
-        self.labelLogout.bind("<Leave>", lambda event: self.on_leave(self.labelLogout))
-        self.labelLogout.grid(column=3, row=0, padx=(95,26), pady=8)
+        self.labellogout = tk.Label(frameHeaderBar, text="logout", font=headerFont, fg=DS.mainFG, bg=DS.mainBG)
+        self.labellogout.bind("<Button-1>", lambda event: self.logout())
+        self.labellogout.bind("<Enter>", lambda event: self.on_enter(self.labellogout))
+        self.labellogout.bind("<Leave>", lambda event: self.on_leave(self.labellogout))
+        self.labellogout.grid(column=3, row=0, padx=(95,26), pady=8)
         headerLine = tk.Canvas(frameHeaderBar, height=2, width=570, bd=0, highlightthickness=0, bg=lineStyle)
         headerLine.grid(row=1, padx=10, column=0, columnspan=4)
         frameHeaderBar.grid(row=0, sticky="w")
         #Main content
-        self.gamesLibrary = list(DictionaryReader("config/gamesLibrary").items())
-        self.saleInfo = list(DictionaryReader("config/saleInfo").items())
+        self.gamesLibrary = list(dictionary_reader("config/gamesLibrary").items())
+        self.saleInfo = list(dictionary_reader("config/saleInfo").items())
         titleFont = tkfont.Font(family='Arial', size=14, weight="bold")
         contentFont = tkfont.Font(family='Arial', size=12)
         fontS = tkfont.Font(family="Arial", overstrike=1, size=10)
@@ -938,16 +933,16 @@ class Haze_Store(tk.Frame):
         #Sale 1
         frameSale1 = tk.Frame(frameSale, bg=DS.startupD)
         self.labelSale1Var = tk.StringVar()
-        self.TryDisplay(0, self.labelSale1Var)
+        self.try_display(0, self.labelSale1Var)
         labelSale1Title = tk.Label(frameSale1, textvariable=self.labelSale1Var, font=titleFont, bg=DS.startupD, fg=DS.mainFG)
         labelSale1Title.grid(row=0, column=0, pady=5, columnspan=2)
         frameSale1Frame = tk.Frame(frameSale1, bg=DS.startupD)
         labelSale1RedSVar = tk.StringVar()
-        labelSale1RedSVar.set(self.DisplaySale(0, False))
+        labelSale1RedSVar.set(self.display_sale(0, False))
         labelSale1RedS = tk.Label(frameSale1Frame, textvariable=labelSale1RedSVar, bg=DS.startupD, fg=DS.mainFG, font=fontS)
         labelSale1RedS.grid(row=0, column=0)
         labelSale1RedVar = tk.StringVar()
-        labelSale1RedVar.set(self.DisplaySale(0, True))
+        labelSale1RedVar.set(self.display_sale(0, True))
         labelSale1Red = tk.Label(frameSale1Frame, textvariable=labelSale1RedVar, bg=DS.startupD, fg=DS.mainFG)
         labelSale1Red.grid(row=1, column=0)
         frameSale1Frame.grid(row=1, column=0, padx=25, pady=10)
@@ -955,22 +950,22 @@ class Haze_Store(tk.Frame):
         labelSale1SaleVar.set("-" + str('%.3g'%(100 - self.saleInfo[0][1]*100)) + "%")
         labelSale1Sale = tk.Label(frameSale1, textvariable=labelSale1SaleVar, font=saleFont, bg=DS.startupD, fg=DS.mainFG)
         labelSale1Sale.grid(row=1, column=1, padx=10)
-        self.buttonSale1 = tk.Button(frameSale1, text="Add to cart", bg=DS.mainHover, fg=DS.mainFG, command=lambda: self.CartAdd(0, self.buttonSale1, self.labelPrice1Var))
+        self.buttonSale1 = tk.Button(frameSale1, text="Add to cart", bg=DS.mainHover, fg=DS.mainFG, command=lambda: self.cart_add(0, self.buttonSale1, self.labelPrice1Var))
         self.buttonSale1.grid(row=2, column=0, columnspan=2)
         frameSale1.grid(padx=20, row=1, column=0, ipady=5, pady=5)
         #Sale 2
         frameSale2 = tk.Frame(frameSale, bg=DS.startupD)
         self.labelSale2Var = tk.StringVar()
-        self.TryDisplay(1, self.labelSale2Var)
+        self.try_display(1, self.labelSale2Var)
         labelSale2Title = tk.Label(frameSale2, textvariable=self.labelSale2Var, font=titleFont, bg=DS.startupD, fg=DS.mainFG)
         labelSale2Title.grid(row=0, column=0, pady=5, columnspan=2)
         frameSale2Frame = tk.Frame(frameSale2, bg=DS.startupD)
         labelSale2RedSVar = tk.StringVar()
-        labelSale2RedSVar.set(self.DisplaySale(1, False))
+        labelSale2RedSVar.set(self.display_sale(1, False))
         labelSale2RedS = tk.Label(frameSale2Frame, textvariable=labelSale2RedSVar, bg=DS.startupD, fg=DS.mainFG, font=fontS)
         labelSale2RedS.grid(row=0, column=0)
         labelSale2RedVar = tk.StringVar()
-        labelSale2RedVar.set(self.DisplaySale(1, True))
+        labelSale2RedVar.set(self.display_sale(1, True))
         labelSale2Red = tk.Label(frameSale2Frame, textvariable=labelSale2RedVar, bg=DS.startupD, fg=DS.mainFG)
         labelSale2Red.grid(row=1, column=0)
         frameSale2Frame.grid(row=1, column=0, padx=25, pady=10)
@@ -978,7 +973,7 @@ class Haze_Store(tk.Frame):
         labelSale2SaleVar.set("-" + str('%.3g'%(100 - self.saleInfo[1][1]*100)) + "%")
         labelSale2Sale = tk.Label(frameSale2, textvariable=labelSale2SaleVar, font=saleFont, bg=DS.startupD, fg=DS.mainFG)
         labelSale2Sale.grid(row=1, column=1, padx=10)
-        self.buttonSale2 = tk.Button(frameSale2, text="Add to cart", bg=DS.mainHover, fg=DS.mainFG, command=lambda: self.CartAdd(1, self.buttonSale2, self.labelPrice2Var))
+        self.buttonSale2 = tk.Button(frameSale2, text="Add to cart", bg=DS.mainHover, fg=DS.mainFG, command=lambda: self.cart_add(1, self.buttonSale2, self.labelPrice2Var))
         self.buttonSale2.grid(row=2, column=0, columnspan=2)
         frameSale2.grid(row=3, column=0, ipady=5, pady=5, rowspan=2)
         frameSale.grid(row=0, column=0, rowspan=2)
@@ -991,7 +986,7 @@ class Haze_Store(tk.Frame):
         labelShoppingTitle.grid(row=0, column=0, pady=5, ipadx=50)
         #Shopping 1
         frameShopping1 = tk.Frame(frameShoppingCart, bg=DS.startupD)
-        buttonX1 = tk.Button(frameShopping1, bg=DS.startupD, fg=DS.mainFG, text="X", font=tkfont.Font(family="Arial", size=6, weight="bold"), command=lambda: self.CartRemove(0))
+        buttonX1 = tk.Button(frameShopping1, bg=DS.startupD, fg=DS.mainFG, text="X", font=tkfont.Font(family="Arial", size=6, weight="bold"), command=lambda: self.cart_remove(0))
         buttonX1.grid(row=0, column=0) 
         self.labelShopping1Var = tk.StringVar()
         self.labelShopping1Var.set("")
@@ -1004,7 +999,7 @@ class Haze_Store(tk.Frame):
         frameShopping1.grid(row=1, column=0, pady=2)
         #Shopping 2
         frameShopping2 = tk.Frame(frameShoppingCart, bg=DS.startupD)
-        buttonX2 = tk.Button(frameShopping2, bg=DS.startupD, fg=DS.mainFG, text="X", font=tkfont.Font(family="Arial", size=6, weight="bold"), command=lambda: self.CartRemove(1))
+        buttonX2 = tk.Button(frameShopping2, bg=DS.startupD, fg=DS.mainFG, text="X", font=tkfont.Font(family="Arial", size=6, weight="bold"), command=lambda: self.cart_remove(1))
         buttonX2.grid(row=0, column=0)
         self.labelShopping2Var = tk.StringVar()
         self.labelShopping2Var.set("")
@@ -1021,7 +1016,7 @@ class Haze_Store(tk.Frame):
         labelTotal = tk.Label(frameShoppingCart, textvariable=self.labelTotalVar, bg=DS.startupD, fg=DS.mainFG, font=titleFont)
         labelTotal.grid(row=3, column=0, padx=20, pady=6)
         #Checkout button
-        buttonCheckout = tk.Button(frameShoppingCart, bg=DS.mainHover, fg=DS.mainFG, text="Checkout", font=tkfont.Font(family="Arial", size=10, weight="bold"), command=lambda: self.Checkout())
+        buttonCheckout = tk.Button(frameShoppingCart, bg=DS.mainHover, fg=DS.mainFG, text="Checkout", font=tkfont.Font(family="Arial", size=10, weight="bold"), command=lambda: self.checkout())
         buttonCheckout.grid(row=4, column=0, ipadx=12, ipady=4, padx=20)
         frameShoppingCart.grid(row=0, column=2, sticky="w", padx=20, pady=5, ipady=5)
         #Buy
@@ -1030,60 +1025,60 @@ class Haze_Store(tk.Frame):
         #Shopping 3
         frameShopping3 = tk.Frame(frameBuy, bg=DS.startupD)
         self.labelShopping3Var = tk.StringVar()
-        self.TryDisplay(2, self.labelShopping3Var)
+        self.try_display(2, self.labelShopping3Var)
         labelShopping3 = tk.Label(frameShopping3, textvariable=self.labelShopping3Var, bg=DS.startupD, fg=DS.mainFG, font=smallTitleFont)
         labelShopping3.grid(row=0, column=0, pady=7, padx=19)
         labelPrice3Var = tk.StringVar()
-        labelPrice3Var.set(self.DisplaySale(2, False))
+        labelPrice3Var.set(self.display_sale(2, False))
         labelPrice3 = tk.Label(frameShopping3, textvariable=labelPrice3Var, bg=DS.startupD, fg=DS.mainFG, font=contentFont)
         labelPrice3.grid(row=0, column=1, padx=5)
-        self.buttonBuy3 = tk.Button(frameShopping3, text="Add to cart", bg=DS.mainHover, fg=DS.mainFG, command=lambda: self.CartAdd(2, self.buttonBuy3, labelPrice3Var))
+        self.buttonBuy3 = tk.Button(frameShopping3, text="Add to cart", bg=DS.mainHover, fg=DS.mainFG, command=lambda: self.cart_add(2, self.buttonBuy3, labelPrice3Var))
         self.buttonBuy3.grid(row=0, column=2, padx=5)
         frameShopping3.grid(sticky="w", row=0, column=0)
         #Shopping 4
         frameShopping4 = tk.Frame(frameBuy, bg=DS.startupD)
         self.labelShopping4Var = tk.StringVar()
-        self.TryDisplay(3, self.labelShopping4Var)
+        self.try_display(3, self.labelShopping4Var)
         labelShopping4 = tk.Label(frameShopping4, textvariable=self.labelShopping4Var, bg=DS.startupD, fg=DS.mainFG, font=smallTitleFont)
         labelShopping4.grid(row=0, column=0, pady=7, padx=10)
         labelPrice4Var = tk.StringVar()
-        labelPrice4Var.set(self.DisplaySale(3, False))
+        labelPrice4Var.set(self.display_sale(3, False))
         labelPrice4 = tk.Label(frameShopping4, textvariable=labelPrice4Var, bg=DS.startupD, fg=DS.mainFG, font=contentFont)
         labelPrice4.grid(row=0, column=1, padx=5)
-        self.buttonBuy4 = tk.Button(frameShopping4, text="Add to cart", bg=DS.mainHover, fg=DS.mainFG, command=lambda: self.CartAdd(3, self.buttonBuy4, labelPrice4Var))
+        self.buttonBuy4 = tk.Button(frameShopping4, text="Add to cart", bg=DS.mainHover, fg=DS.mainFG, command=lambda: self.cart_add(3, self.buttonBuy4, labelPrice4Var))
         self.buttonBuy4.grid(row=0, column=2, padx=5)
         frameShopping4.grid(sticky="w", row=1, column=0)
         #Shopping 5
         frameShopping5 = tk.Frame(frameBuy, bg=DS.startupD)
         self.labelShopping5Var = tk.StringVar()
-        self.TryDisplay(4, self.labelShopping5Var)
+        self.try_display(4, self.labelShopping5Var)
         labelShopping5 = tk.Label(frameShopping5, textvariable=self.labelShopping5Var, bg=DS.startupD, fg=DS.mainFG, font=smallTitleFont)
         labelShopping5.grid(row=0, column=0, pady=7, padx=21)
         labelPrice5Var = tk.StringVar()
-        labelPrice5Var.set(self.DisplaySale(4, False))
+        labelPrice5Var.set(self.display_sale(4, False))
         labelPrice5 = tk.Label(frameShopping5, textvariable=labelPrice5Var, bg=DS.startupD, fg=DS.mainFG, font=contentFont)
         labelPrice5.grid(row=0, column=1, padx=5)
-        self.buttonBuy5 = tk.Button(frameShopping5, text="Add to cart", bg=DS.mainHover, fg=DS.mainFG, command=lambda: self.CartAdd(4, self.buttonBuy5, labelPrice5Var))
+        self.buttonBuy5 = tk.Button(frameShopping5, text="Add to cart", bg=DS.mainHover, fg=DS.mainFG, command=lambda: self.cart_add(4, self.buttonBuy5, labelPrice5Var))
         self.buttonBuy5.grid(row=0, column=2, padx=5)
         frameShopping5.grid(sticky="w", row=2, column=0)
         self.buttonList = ["",""]
         self.allButtonList = [self.buttonSale1, self.buttonSale2, self.buttonBuy3, self.buttonBuy4, self.buttonBuy5]
         self.labelList = [self.labelSale1Var, self.labelSale2Var, self.labelShopping3Var, self.labelShopping4Var, self.labelShopping5Var]
-        self.CheckStore()
+        self.check_store()
         frameBuy.grid(row=1, column=2)
         frameMainFrame.grid(sticky="w")
         frameMain.grid(sticky="w")  
 
     #Attempt to display the title of the book based on given index
-    def TryDisplay(self, index, who):
+    def try_display(self, index, who):
         try:
             who.set(self.gamesLibrary[int(self.saleInfo[index][0])][1]["title"])
         except:
             who.set("")
-        self.CheckStore()
+        self.check_store()
 
-    def CheckStore(self):
-        gamesLibrary = DictionaryReader("users/" + str(currentUser.username) + "/gamesLibrary.txt")
+    def check_store(self):
+        gamesLibrary = dictionary_reader("users/" + str(currentUser.username) + "/gamesLibrary.txt")
         for game in range(0, 5):
             try:
                 if gamesLibrary[str(5+game)]["title"] == self.labelList[game].get():
@@ -1092,7 +1087,7 @@ class Haze_Store(tk.Frame):
                 pass
 
     #Checkout function draws a credit card window
-    def Checkout(self):
+    def checkout(self):
         self.windowCheckout = tk.Toplevel(bg=DS.mainBG)
         self.windowCheckout.resizable(False, False)
         self.windowCheckout.wm_title("Checkout")
@@ -1119,7 +1114,7 @@ class Haze_Store(tk.Frame):
         entryCVV = tk.Entry(frameCheckout, textvariable=traceCVVEntry, borderwidth=0, insertbackground=DS.startupFG, fg=DS.startupFG, bg=DS.startupD, width=4)
         entryCVV.grid(row=2, column=3, padx=2, pady=10)
         #Submit
-        buttonSubmit = tk.Button(frameCheckout, text="Submit", command=lambda: self.SubmitCreditcard(traceNumberEntry.get(), traceExpiryEntry.get(), traceCVVEntry.get()), bg=DS.mainHover, fg=DS.mainFG)
+        buttonSubmit = tk.Button(frameCheckout, text="Submit", command=lambda: self.submit_creditcard(traceNumberEntry.get(), traceExpiryEntry.get(), traceCVVEntry.get()), bg=DS.mainHover, fg=DS.mainFG)
         buttonSubmit.grid(row=3, column=1, columnspan=2)
         #Error Msg
         self.labelErrorVar = tk.StringVar()
@@ -1130,7 +1125,7 @@ class Haze_Store(tk.Frame):
 
     #Loosely checks whether the entered info is somewhat plausible and if yes, show success
     #Only needs 12 characters in the number section, 4 in the expiry and 3 in the cvv
-    def SubmitCreditcard(self, number, expiry, cvv):
+    def submit_creditcard(self, number, expiry, cvv):
         errorList = ""
         if len(number) != 12:
             errorList += "Number\n"
@@ -1159,7 +1154,6 @@ class Haze_Store(tk.Frame):
                         start = 9*(maxGame+game+1)+1
                         gamesLibrary += '\t"' + str(maxGame+game+1) + '": {\n'
                         for lines in range(start+1, start+8):
-                            print(realGamesLib[lines])
                             gamesLibrary += [realGamesLib[lines]]
                         if game == 0 and currentUser.shoppingCart[game] != "":
                             try:
@@ -1172,14 +1166,14 @@ class Haze_Store(tk.Frame):
                     file.writelines(gamesLibrary)
                     file.close()
                 file.close()
-            Haze_Library.UpdateLibrary(Haze_Library)
+            Haze_Library.update_library(Haze_Library)
             self.windowCheckout.destroy()
         else:
             errorList += "Are incorrect"
             self.labelErrorVar.set(errorList)
 
     #Calculates the total price of the shopping cart
-    def CalculateCart(self):
+    def calculate_cart(self):
         totalMsg = "Total: $"
         total = 0
         gameLib = []
@@ -1194,55 +1188,55 @@ class Haze_Store(tk.Frame):
                 total += float(price.replace("NZD $", ""))
         totalMsg += str(total)
         self.labelTotalVar.set(totalMsg)
-        self.CheckStore()
+        self.check_store()
 
     #Adds the selected game to the shopping cart
-    def CartAdd(self, index, who, var):
+    def cart_add(self, index, who, var):
         if currentUser.shoppingCart[0] == "":
             currentUser.shoppingCart[0] = self.gamesLibrary[int(self.saleInfo[index][0])][1]
-            self.labelPrice1Var.set(self.DisplaySale(index, True))
+            self.labelPrice1Var.set(self.display_sale(index, True))
             self.labelShopping1Var.set(currentUser.shoppingCart[0]["title"])
             who["state"] = "disabled"
             self.buttonList[0] = who
             currentUser.cartIndexes[0] = 5+index
-            self.CalculateCart()
+            self.calculate_cart()
         elif currentUser.shoppingCart[1] == "":
             currentUser.shoppingCart[1] = self.gamesLibrary[int(self.saleInfo[index][0])][1]
-            self.labelPrice2Var.set(self.DisplaySale(index, True))
+            self.labelPrice2Var.set(self.display_sale(index, True))
             self.labelShopping2Var.set(currentUser.shoppingCart[1]["title"])
             who["state"] = "disabled"
             self.buttonList[1] = who
             currentUser.cartIndexes[1] = 5+index
-            self.CalculateCart()
-        self.CheckStore()
+            self.calculate_cart()
+        self.check_store()
 
     #Removes the selected game from the shopping cart
-    def CartRemove(self, index):
+    def cart_remove(self, index):
         if index == 0:
             currentUser.shoppingCart[0] = ""
             self.labelPrice1Var.set("")
             self.labelShopping1Var.set("")
             self.buttonList[0]["state"] = "normal"
             currentUser.cartIndexes[0] = ""
-            self.CalculateCart()
+            self.calculate_cart()
         elif index == 1:
             currentUser.shoppingCart[1] = ""
             self.labelPrice2Var.set("")
             self.labelShopping2Var.set("")
             self.buttonList[1]["state"] = "normal"
             currentUser.cartIndexes[1] = ""
-            self.CalculateCart()
-        self.CheckStore()
+            self.calculate_cart()
+        self.check_store()
  
     #Formats the price before and after selected discount
-    def DisplaySale(self, index, divide):
-        self.CheckStore()
+    def display_sale(self, index, divide):
+        self.check_store()
         try:
             display = str(currentUser.currency) + " $"
             if divide:
-                display += str('%.3g'%(Converter((self.saleInfo[index][1] * self.gamesLibrary[int(self.saleInfo[index][0])][1]["price"]), currentUser.currency)-0.01))
+                display += str('%.3g'%(converter((self.saleInfo[index][1] * self.gamesLibrary[int(self.saleInfo[index][0])][1]["price"]), currentUser.currency)-0.01))
             else:
-                display += str('%.3g'%(Converter((self.gamesLibrary[int(self.saleInfo[index][0])][1]["price"]), currentUser.currency)-0.01))
+                display += str('%.3g'%(converter((self.gamesLibrary[int(self.saleInfo[index][0])][1]["price"]), currentUser.currency)-0.01))
             return display
         except:
             return ""
@@ -1253,20 +1247,20 @@ class Haze_Store(tk.Frame):
     def on_leave(self, who):
         who.config(fg=DS.mainFG)
 
-    def Logout(self):
-        self.windowLogout = tk.Toplevel(bg=DS.mainBG)
-        self.windowLogout.resizable(False, False)
-        self.windowLogout.wm_title("Logout")
-        frameButtons = tk.Frame(self.windowLogout, bg=DS.mainBG)
-        labelLogoutMessage = tk.Label(self.windowLogout, fg=DS.mainFG, bg=DS.mainBG, text="Are you sure you want to log out?",
+    def logout(self):
+        self.windowlogout = tk.Toplevel(bg=DS.mainBG)
+        self.windowlogout.resizable(False, False)
+        self.windowlogout.wm_title("logout")
+        frameButtons = tk.Frame(self.windowlogout, bg=DS.mainBG)
+        labellogoutMessage = tk.Label(self.windowlogout, fg=DS.mainFG, bg=DS.mainBG, text="Are you sure you want to log out?",
             font=tkfont.Font(family='Arial', size=10, weight="bold", slant="roman")).pack(pady=(18,8), padx=15)
-        buttonYes = tk.Button(frameButtons, text="Yes", fg=DS.mainFG, bg=DS.mainBG, command=lambda: self.LogoutYes()).pack(padx=12, ipadx=8, pady=20, side="left")
-        buttonNo = tk.Button(frameButtons, text="No", fg=DS.mainFG, bg=DS.mainBG, command=self.windowLogout.destroy).pack(padx=12, ipadx=8, pady=20, side="left")
+        buttonYes = tk.Button(frameButtons, text="Yes", fg=DS.mainFG, bg=DS.mainBG, command=lambda: self.logout_yes()).pack(padx=12, ipadx=8, pady=20, side="left")
+        buttonNo = tk.Button(frameButtons, text="No", fg=DS.mainFG, bg=DS.mainBG, command=self.windowlogout.destroy).pack(padx=12, ipadx=8, pady=20, side="left")
         frameButtons.pack()
 
-    def LogoutYes(self):
+    def logout_yes(self):
         global app, path
-        self.windowLogout.destroy()
+        self.windowlogout.destroy()
         config = open(str(path)+"/config/config.txt", "w")
         config.write('{\n\t"logged": "False",\n\t"currentUser": ""\n\t"currency": "NZD"\n}')
         config.close()
@@ -1300,11 +1294,11 @@ class Haze_Settings(tk.Frame):
         self.labelHome.bind("<Enter>", lambda event: self.on_enter(self.labelHome))
         self.labelHome.bind("<Leave>", lambda event: self.on_leave(self.labelHome))
         self.labelHome.grid(column=2, row=0, padx=38, pady=8)
-        self.labelLogout = tk.Label(frameHeaderBar, text="Logout", font=headerFont, fg=DS.mainFG, bg=DS.mainBG)
-        self.labelLogout.bind("<Button-1>", lambda event: self.Logout())
-        self.labelLogout.bind("<Enter>", lambda event: self.on_enter(self.labelLogout))
-        self.labelLogout.bind("<Leave>", lambda event: self.on_leave(self.labelLogout))
-        self.labelLogout.grid(column=3, row=0, padx=(95,26), pady=8)
+        self.labellogout = tk.Label(frameHeaderBar, text="logout", font=headerFont, fg=DS.mainFG, bg=DS.mainBG)
+        self.labellogout.bind("<Button-1>", lambda event: self.logout())
+        self.labellogout.bind("<Enter>", lambda event: self.on_enter(self.labellogout))
+        self.labellogout.bind("<Leave>", lambda event: self.on_leave(self.labellogout))
+        self.labellogout.grid(column=3, row=0, padx=(95,26), pady=8)
         headerLine = tk.Canvas(frameHeaderBar, height=2, width=570, bd=0, highlightthickness=0, bg=lineStyle)
         headerLine.grid(row=1, padx=10, column=0, columnspan=4)
         frameHeaderBar.grid(row=0)
@@ -1324,20 +1318,20 @@ class Haze_Settings(tk.Frame):
     def on_leave(self, who):
         who.config(fg=DS.mainFG)
 
-    def Logout(self):
-        self.windowLogout = tk.Toplevel(bg=DS.mainBG)
-        self.windowLogout.resizable(False, False)
-        self.windowLogout.wm_title("Logout")
-        frameButtons = tk.Frame(self.windowLogout, bg=DS.mainBG)
-        labelLogoutMessage = tk.Label(self.windowLogout, fg=DS.mainFG, bg=DS.mainBG, text="Are you sure you want to log out?",
+    def logout(self):
+        self.windowlogout = tk.Toplevel(bg=DS.mainBG)
+        self.windowlogout.resizable(False, False)
+        self.windowlogout.wm_title("logout")
+        frameButtons = tk.Frame(self.windowlogout, bg=DS.mainBG)
+        labellogoutMessage = tk.Label(self.windowlogout, fg=DS.mainFG, bg=DS.mainBG, text="Are you sure you want to log out?",
             font=tkfont.Font(family='Arial', size=10, weight="bold", slant="roman")).pack(pady=(18,8), padx=15)
-        buttonYes = tk.Button(frameButtons, text="Yes", fg=DS.mainFG, bg=DS.mainBG, command=lambda: self.LogoutYes()).pack(padx=12, ipadx=8, pady=20, side="left")
-        buttonNo = tk.Button(frameButtons, text="No", fg=DS.mainFG, bg=DS.mainBG, command=self.windowLogout.destroy).pack(padx=12, ipadx=8, pady=20, side="left")
+        buttonYes = tk.Button(frameButtons, text="Yes", fg=DS.mainFG, bg=DS.mainBG, command=lambda: self.logout_yes()).pack(padx=12, ipadx=8, pady=20, side="left")
+        buttonNo = tk.Button(frameButtons, text="No", fg=DS.mainFG, bg=DS.mainBG, command=self.windowlogout.destroy).pack(padx=12, ipadx=8, pady=20, side="left")
         frameButtons.pack()
 
-    def LogoutYes(self):
+    def logout_yes(self):
         global app, path
-        self.windowLogout.destroy()
+        self.windowlogout.destroy()
         config = open(str(path)+"/config/config.txt", "w")
         config.write('{\n\t"logged": "False",\n\t"currentUser": ""\n\t"currency": "NZD"\n}')
         config.close()
@@ -1347,32 +1341,33 @@ class Haze_Settings(tk.Frame):
         app.mainloop()
 
 #Creates a game window
-class LaunchGame:
+class Launch_Game:
     def __init__(self, game):
         self.gameMessage = tk.StringVar()
         self.gameWindow = tk.Toplevel(bg=DS.mainBG)
         self.gameWindow.resizable(False, False)
         self.gameWindow.wm_title("game")
-        self.gameWindow.bind("<Return>", self.destroyWindow)
+        self.gameWindow.bind("<Return>", self.destroy_window)
         self.gameWindow.focus_force()
         gameFrame = tk.Frame(self.gameWindow, bg=DS.mainBG)
         self.gameLabel = tk.Label(gameFrame, textvariable = self.gameMessage, bg=DS.mainBG, fg=DS.mainFG, font=tkfont.Font(family='Arial', size=10, weight="bold"))
         self.gameLabel.grid(row = 0, column = 0)
-        gameAcceptButton = tk.Button(gameFrame, text="Exit", command=self.destroyWindow, bg=DS.mainBG, fg=DS.mainFG)
+        gameAcceptButton = tk.Button(gameFrame, text="Exit", command=self.destroy_window, bg=DS.mainBG, fg=DS.mainFG)
         gameAcceptButton.grid(row=1, column=0, padx=10, pady=10, ipadx=8, ipady=5)
+
         self.gameMessage.set("Launched " + game)
         gameFrame.pack(side="top", fill="both", expand=True, padx=70, pady=10)
         CurrentUser.currentlyPlaying = True
-        buttonState()
+        button_state()
 
     #Destroy game window
-    def destroyWindow(self, *args):
+    def destroy_window(self, *args):
         CurrentUser.currentlyPlaying = False
-        buttonState()
+        button_state()
         self.gameWindow.destroy()  
         
 #Create error window
-class raiseError:
+class Raise_Error:
     def __init__(self, errorMessage):
         global errorActive, errorWindowObject
         if errorActive:
@@ -1390,24 +1385,24 @@ class raiseError:
             self.errorWindow = tk.Toplevel()
             self.errorWindow.resizable(False, False)
             self.errorWindow.wm_title("Error")
-            self.errorWindow.bind("<Return>", self.destroyWindow)
+            self.errorWindow.bind("<Return>", self.destroy_window)
             self.errorWindow.focus_force()
             errorFrame = tk.Frame(self.errorWindow)
             self.errorLabel = tk.Label(errorFrame, textvariable = self.errorMessage)
             self.errorLabel.grid(row = 0, column = 0)
-            errorAcceptButton = tk.Button(errorFrame, text="OK", command=self.destroyWindow)
+            errorAcceptButton = tk.Button(errorFrame, text="OK", command=self.destroy_window)
             errorAcceptButton.grid(row=1, column=0)
             self.errorMessage.set("Error: " + errorMessage)
             errorFrame.pack(side="top", fill="both", expand=True, padx=70, pady=10)
             errorWindowObject = self
 
-    def destroyWindow(self, *args):
+    def destroy_window(self, *args):
         global errorActive
         errorActive = False
         self.errorWindow.destroy()    
 
 #Turns buttons on and off if user is playing a game
-def buttonState():
+def button_state():
     global buttonList
     if not CurrentUser.currentlyPlaying:
         for button in buttonList:
@@ -1417,7 +1412,7 @@ def buttonState():
             button["state"] = "disabled"
 
 #Open dictionary from txt file
-def DictionaryReader(File):
+def dictionary_reader(File):
     if ".txt" not in File:
         File = str(File) + ".txt"
     with open(File, "r") as text:
@@ -1426,7 +1421,7 @@ def DictionaryReader(File):
     return loaded
 
 #Converts currency
-def Converter(Price, Currency):
+def converter(Price, Currency):
     if len(Currency) != 3:
         Currency = Location.currency
     else:
@@ -1441,12 +1436,12 @@ def Converter(Price, Currency):
     return Price*Currencies[Currency]
 
 #Checks if user is logged in on startup
-def Startup():
+def startup():
     global path, app, currentUser
-    config = DictionaryReader(str(path)+"/config/config")
+    config = dictionary_reader(str(path)+"/config/config")
     if config["logged"] == "True":
         targetUser = config["currentUser"]
-        tUI = DictionaryReader((str(path)+"/users/"+str(targetUser)+"/config"))
+        tUI = dictionary_reader((str(path)+"/users/"+str(targetUser)+"/config"))
         currentUser = CurrentUser(tUI["username"], tUI["password"], tUI["email"], tUI["DOB"], tUI["currency"])
         return HazeMain()
     else:
@@ -1454,7 +1449,7 @@ def Startup():
         
 currentUser = ""
 buttonList = []
-countryList = DictionaryReader("config/countryList")
+countryList = dictionary_reader("config/countryList")
 path = os.path.dirname(os.path.realpath(__file__))
 userList = []
 for users in os.listdir(str(path) + "/users/"):
@@ -1463,6 +1458,6 @@ emailList = []
 errorActive = False
 errorWindow = ""
 DS = DS()
-app = Startup()
+app = startup()
 app.resizable(False, False)
 app.mainloop()
